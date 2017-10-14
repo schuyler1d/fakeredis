@@ -103,11 +103,16 @@ process.stdout.write('testing fakeredis ...\n\n');
     redis.SADD("hello", "kuku", "buku", test("SADD typerror", BAD_TYPE, null));
     redis.SADD("myset", [ "ala", "bala" ], test("SADD multiarg", null, 2));
     redis.SADD("myset", "niza", "bala", test("SADD delta", null, 1));
+    redis.PFADD("myhyperloglog1", "kuku", "bala", test("PFADD multiarg", null, 2));
+    redis.PFADD("myhyperloglog2", [ "ala", "bala" ], test("PFADD multiarg", null, 2));
     redis.SCARD("hello", test("SCARD typerror", BAD_TYPE, null));
     redis.SCARD("myset", test("SCARD", null, 3));
+    redis.PFCOUNT("myhyperloglog2", test("PFCOUNT", null, 2));
     redis.SADD("set2", 1, 2, 3, 4, 5);
     redis.SADD("set3", "xxx", "zzz", "yyy");
     redis.SUNIONSTORE("output", [ "nonex1", "myset", "set2", "set3", "nonex2" ], test("SUNIONSTORE", null, 11));
+    redis.PFMERGE("hyperoutput", [ "myhyperloglog1", "myhyperloglog2" ], test("PFMERGE", null, OK));
+    redis.PFCOUNT("hyperoutput", test("PFMERGE result", null, 3));
     redis.SISMEMBER("output", "xxx", test("SISMEMBER union 3 sets", null, 1));
     redis.SINTER("myset", "output", test("SINTER", null, [ "ala", "bala", "niza" ]));
     redis.SINTER("myset", "outputs", test("SINTER nonex empty 1", null, []));
@@ -1006,7 +1011,7 @@ function countTests() {
 }
 
 var NUM_TESTS = countTests();
-if (NUM_TESTS !== 286)
+if (NUM_TESTS !== 291)
     throw new Error("Test count is off: " + NUM_TESTS);
 
 process.on('exit', function () {

@@ -94,6 +94,10 @@ For example,
 in Redis it appears to be perfectly legitimate to have `SORT myset ALPHA LIMIT 0 5`,
 but in fakeredis this will currently return a syntax error.
 
+Also, the HyperLogLog commands `PFADD`, `PFCOUNT` are implemented as sets rather than a true
+HyperLogLog datastructure, thus storage is actually O(n) and the `PFCOUNT` result is always
+exact unlike the approximate result from Redis.
+
 I'm totally open to discussion on both points.
 
 
@@ -216,6 +220,12 @@ Sorted Sets:
     ZREVRANK
     ZSCORE
     ZUNIONSTORE
+
+HyperLogLog Sets:
+
+    PFADD
+    PFCOUNT
+    PFMERGE
 
 Pub/Sub:
 
